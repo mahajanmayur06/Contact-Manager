@@ -2,6 +2,7 @@ const expressAsyncHandler = require("express-async-handler");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+
 //@desc Register a user
 //@route POST /api/users/register
 //@access public
@@ -20,8 +21,12 @@ const registerUser = expressAsyncHandler(async (req,res) => {
     });
     console.log(`User created ${user}`);
     if (user){
-        res.status(201).json( {user})
+        res.status(201).json( {_id : user.id, email: user.email})
+    } else {
+        res.status(400);
+        throw new Error("user data is not valid")
     }
+    res.json({ message : "Register"});
     
 })
 
@@ -39,10 +44,10 @@ const loginUser = expressAsyncHandler(async (req, res) => {
         const accessToken = jwt.sign(            
             {
                 user : {
-                username : user.username,
-                email : user.email,
-                id : user.id
-            }
+                    username : user.username,
+                    email : user.email,
+                    id : user.id
+                },
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
